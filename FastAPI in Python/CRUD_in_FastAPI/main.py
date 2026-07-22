@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
+from typing import Optional
 from pydantic import BaseModel
 app = FastAPI(title="Task API", 
               description="A simple Task Management API built with FastAPI.",
@@ -109,3 +110,14 @@ async def delete_task(id: int):
     global tasks
     tasks = [task for task in tasks if task["id"] != id]
     return {"message": f"Task {id} deleted"}
+
+
+# Optional tasks
+
+@app.get("/tasks")
+async def get_tasks(done: Optional[bool] = None):
+    if done is None:
+        return tasks
+
+    return [task for task in tasks if task["done"] == done]
+
