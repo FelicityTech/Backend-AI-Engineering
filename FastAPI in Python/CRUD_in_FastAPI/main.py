@@ -86,3 +86,25 @@ async def create_task(task: TaskCreate):
     tasks.append(new_task)
 
     return new_task
+
+
+# Stage 4 - Update and delete task
+@app.put("/tasks/{id}")
+async def update_task(id: int, task: TaskCreate):
+    for i, t in enumerate(tasks):
+        if t["id"] == id:
+            if task.title is not None:
+                tasks[i]["title"] = task.title
+            return tasks[i]
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": f"Task {id} not found"
+        }
+    )
+
+@app.delete("/tasks/{id}")
+async def delete_task(id: int):
+    global tasks
+    tasks = [task for task in tasks if task["id"] != id]
+    return {"message": f"Task {id} deleted"}
