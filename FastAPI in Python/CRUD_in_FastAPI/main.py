@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 app = FastAPI(title="Task API", 
+              description="A simple Task Management API built with FastAPI.",
               version="1.0"
               )
 class TaskCreate(BaseModel):
