@@ -1,7 +1,6 @@
 from sqlmodel import Session, select
 
-from .models import Task
-
+from models import Task
 
 class PostgresTaskRepository:
     def __init__(self, session: Session):
