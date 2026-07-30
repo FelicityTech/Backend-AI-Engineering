@@ -47,6 +47,8 @@ async def lifespan(app: FastAPI):
             session.commit()
     yield
 
+class TaskCreate(BaseModel):
+    title: str | None = None
 app = FastAPI(lifespan=lifespan)
 
 @app.get("/")
@@ -74,3 +76,26 @@ async def get_task(id: int, session: SessionDep):
         )
 
     return task
+
+@app.post("/tasks", status_code=201)
+async def create_task(task: TaskCreate, session: SessionDep):
+    
+    # Validation
+    if task.title.strip() == "":
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": "Task title is required"
+            }
+        )
+    
+    new_task = Tasks(
+        title=task.title,
+        done=False
+    )
+
+    session.add(new_task)
+    session.commit()
+    session.refresh(new_task)
+
+    return new_task
