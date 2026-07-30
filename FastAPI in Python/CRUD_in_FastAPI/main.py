@@ -24,6 +24,11 @@ tasks = [
         "id": 3,
         "title": "Deploy the API",
         "done": False
+    },
+    {
+        "id": 4,
+        "title": "Scale the API",
+        "done": True
     }
 ]
 
@@ -115,9 +120,44 @@ async def delete_task(id: int):
 # Optional tasks
 
 @app.get("/tasks")
-async def get_tasks(done: Optional[bool] = None):
-    if done is None:
-        return tasks
+async def get_tasks(
+    id: Optional[int] = None,
+    done: Optional[bool] = None,
+    search: Optional[str] = None,
+):
+    # Return one task if id is provided
+    if id is not None:
+        for task in tasks:
+            if task["id"] == id:
+                return task
 
-    return [task for task in tasks if task["done"] == done]
+        return JSONResponse(
+            status_code=404,
+            content={"error": f"Task {id} not found"}
+        )
 
+    # Otherwise apply filters
+    result = tasks
+
+    if done is not None:
+        result = [task for task in result if task["done"] == done]
+
+    if search:
+        result = [
+            task for task in result
+            if search.lower() in task["title"].lower()
+        ]
+
+    return result
+
+@app.patch("/tasks/{id}/toggle")
+async def toggle_task(id: int):
+    for task in tasks:
+        if task["id"] == id:
+            task["done"] = not task["done"]
+            return task
+
+    return JSONResponse(
+        status_code=404,
+        content={"error": f"Task {id} not found"}
+    )
