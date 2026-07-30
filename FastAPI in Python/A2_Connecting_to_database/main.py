@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.responses import JSONResponse
 from datetime import datetime, timezone
 from typing import Any, Annotated, Generic, TypeVar
 from contextlib import asynccontextmanager
@@ -53,3 +54,23 @@ async def root(session: SessionDep):
     data = session.exec(select(Tasks)).all()
     return {"Tasks": data}
 
+@app.get("/tasks")
+async def read_tasks(session: SessionDep):
+    data = session.exec(select(Tasks)).all()
+    return {"Tasks": data}
+
+
+# GET one task by ID
+@app.get("/tasks/{id}")
+async def get_task(id: int, session: SessionDep):
+    task = session.get(Tasks, id)
+
+    if task is None:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": "Task not found"
+            }
+        )
+
+    return task
