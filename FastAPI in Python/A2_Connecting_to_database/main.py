@@ -99,3 +99,44 @@ async def create_task(task: TaskCreate, session: SessionDep):
     session.refresh(new_task)
 
     return new_task
+
+
+# Update and delete
+@app.put("/tasks/{id}")
+async def update_task(id: int, task: TaskCreate, session: SessionDep):
+    db_task = session.get(Tasks, id)
+
+    if db_task is None:
+        return JSONResponse(
+            status_code=404,
+            content ={
+                "error": f"Task {id} not found"
+            }
+        )
+    db_task.title = task.title
+
+    session.add(db_task)
+    session.commit()
+    session.refresh(db_task)
+    
+    return db_task
+
+@app.delete("/tasks/{id}")
+async def delete_task(id: int, session: SessionDep):
+    task = session.get(Tasks, id)
+
+    if task is None:
+        return JSONResponse(
+            status_code=404,
+            content={
+                "error": f"Task {id} not found"
+            }
+        )
+
+    session.delete(task)
+    session.commit()
+
+
+    return {
+        "message": f"Task {id} deleted"
+    }
