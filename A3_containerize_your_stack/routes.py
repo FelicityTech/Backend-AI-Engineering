@@ -2,11 +2,10 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from sqlmodel import Session
 
-from .database import get_session
-from .repository import PostgresTaskRepository
-from .schemas import TaskCreate
-from .service import TaskService
-
+from database import get_session
+from repository import PostgresTaskRepository
+from service import TaskService
+from schemas import TaskCreate
 router = APIRouter(
     prefix="/tasks",
     tags=["Tasks"]
